@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = MainActivity.class.getSimpleName();
     public static final String DAILY_FORECAST = "DAILY_FORECAST";
+    public static final String HOURLY_FORECAST = "HOURLY_FORECAST";
     private Forecast mForecast;
 
     @Bind(R.id.timeLabel) TextView mTimeLabel;
@@ -199,13 +200,13 @@ public class MainActivity extends AppCompatActivity {
         Day[] days = new Day[data.length()];
 
         for (int i=0;i<data.length();i++) {
-            JSONObject jsonHour = data.getJSONObject(i);
+            JSONObject jsonDay = data.getJSONObject(i);
             Day day = new Day();
 
-            day.setSummary(jsonHour.getString("summary"));
-            day.setTemperatureMax(jsonHour.getDouble("temperatureMax"));
-            day.setIcon(jsonHour.getString("icon"));
-            day.setTime(jsonHour.getLong("time"));
+            day.setSummary(jsonDay.getString("summary"));
+            day.setTemperatureMax(jsonDay.getDouble("temperatureMax"));
+            day.setIcon(jsonDay.getString("icon"));
+            day.setTime(jsonDay.getLong("time"));
             day.setTimezone(timezone);
             days[i] = day;
         }
@@ -271,6 +272,14 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, DailyForecastActivity.class);
         intent.putExtra(DAILY_FORECAST, mForecast.getDailyForecast());
         startActivity(intent);
+    }
+
+    @OnClick (R.id.hourlyButton)
+    public void startHourlyActivity(View view) {
+        Intent intent = new Intent(this, HourlyForecastActivity.class);
+        intent.putExtra(HOURLY_FORECAST, mForecast.getHourlyForecast());
+        startActivity(intent);
+
     }
 
 }
