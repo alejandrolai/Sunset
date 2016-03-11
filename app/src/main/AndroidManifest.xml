@@ -24,9 +24,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".ui.DailyForecastActivity"
-                  android:screenOrientation="portrait"
-                  android:theme="@style/AppTheme.NoActionBar">>
+        <activity android:name=".ui.DailyForecastActivity">
         </activity>
     </application>
 

@@ -1,6 +1,7 @@
 package com.alejandrolai.sunset.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -30,6 +31,7 @@ import java.io.IOException;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -41,7 +43,8 @@ public class MainActivity extends AppCompatActivity {
     public static final String FORECASTIO_API_KEY = BuildConfig.FORECASTIO_API_KEY;
     public static final String GOOGLE_MAPS_API_KEY = BuildConfig.GOOGLE_MAPS_API_KEY;
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+    public static final String TAG = MainActivity.class.getSimpleName();
+    public static final String DAILY_FORECAST = "DAILY_FORECAST";
     private Forecast mForecast;
 
     @Bind(R.id.timeLabel) TextView mTimeLabel;
@@ -261,6 +264,13 @@ public class MainActivity extends AppCompatActivity {
             isAvailable = true;
         }
         return isAvailable;
+    }
+
+    @OnClick (R.id.dailyButton)
+    public void startDailyActivity(View view) {
+        Intent intent = new Intent(this, DailyForecastActivity.class);
+        intent.putExtra(DAILY_FORECAST, mForecast.getDailyForecast());
+        startActivity(intent);
     }
 
 }

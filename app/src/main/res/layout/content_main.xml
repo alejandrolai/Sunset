@@ -162,7 +162,7 @@
             android:layout_weight="1"
             android:text="HOURLY"
             android:textColor="#ffffff"
-            android:id="@+id/hourly"
+            android:id="@+id/hourlyButton"
             android:background="#40ffffff"/>
 
         <Button
@@ -171,7 +171,7 @@
             android:layout_weight="1"
             android:text="7 DAILY"
             android:textColor="#ffffff"
-            android:id="@+id/daily"
+            android:id="@+id/dailyButton"
             android:background="#40ffffff"
             android:layout_marginLeft="2dp"/>
     </LinearLayout>
