@@ -1,11 +1,13 @@
 package com.alejandrolai.sunset.adapters;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.alejandrolai.sunset.R;
 import com.alejandrolai.sunset.weather.Hour;
@@ -16,12 +18,14 @@ import com.alejandrolai.sunset.weather.Hour;
 public class HourAdapter extends RecyclerView.Adapter<HourAdapter.HourViewHolder>{
 
     private Hour[] mHours;
+    private Context mContext;
 
-    public HourAdapter(Hour[] hours) {
+    public HourAdapter(Context context, Hour[] hours) {
+        mContext = context;
         mHours = hours;
     }
 
-    public class HourViewHolder extends RecyclerView.ViewHolder {
+    public class HourViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         public TextView mTimeLabel;
         public TextView mSummaryLabel;
@@ -34,6 +38,8 @@ public class HourAdapter extends RecyclerView.Adapter<HourAdapter.HourViewHolder
             mSummaryLabel = (TextView) itemView.findViewById(R.id.summaryLabel);
             mTemperatureLavel = (TextView) itemView.findViewById(R.id.temperatureLabel);
             mIconImageView = (ImageView) itemView.findViewById(R.id.iconImageView);
+
+            itemView.setOnClickListener(this);
         }
 
         public void bindHour(Hour hour) {
@@ -41,6 +47,15 @@ public class HourAdapter extends RecyclerView.Adapter<HourAdapter.HourViewHolder
             mSummaryLabel.setText(hour.getSummary());
             mTemperatureLavel.setText(hour.getTemperature() + "");
             mIconImageView.setImageResource(hour.getIconId());
+        }
+
+        @Override
+        public void onClick(View v) {
+            String time = mTimeLabel.toString();
+            String temperature = mSummaryLabel.toString();
+            String summary = mTemperatureLavel.toString();
+            String message = String.format("At %s it will be %s and %s", time, temperature, summary);
+            Toast.makeText(mContext,message,Toast.LENGTH_SHORT).show();
         }
     }
     @Override
