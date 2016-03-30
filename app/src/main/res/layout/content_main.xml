@@ -46,7 +46,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="60dp"
-        android:text="Alcatraz Island, CA"
+        android:text="San Francisco, CA"
         android:textSize="24sp"
         android:id="@+id/locationLabel"
         android:textColor="@android:color/white"
