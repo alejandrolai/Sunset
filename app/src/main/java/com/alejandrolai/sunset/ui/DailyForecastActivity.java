@@ -1,11 +1,11 @@
 package com.alejandrolai.sunset.ui;
 
 import android.app.Activity;
-import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -21,12 +21,13 @@ import java.util.Arrays;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class DailyForecastActivity extends Activity {
+public class DailyForecastActivity extends AppCompatActivity {
 
     private Day[] mDays;
 
     @Bind(android.R.id.list) ListView mListView;
     @Bind(android.R.id.empty) TextView mEmptyTextView;
+    @Bind(R.id.toolbar) Toolbar mToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +35,8 @@ public class DailyForecastActivity extends Activity {
         setContentView(R.layout.activity_daily_forecast);
         ButterKnife.bind(this);
 
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Intent intent = getIntent();
         Parcelable[] parcelables = intent.getParcelableArrayExtra(MainActivity.DAILY_FORECAST);
         mDays = Arrays.copyOf(parcelables,parcelables.length,Day[].class);

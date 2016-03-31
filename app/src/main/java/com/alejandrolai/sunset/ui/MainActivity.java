@@ -13,7 +13,10 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -63,24 +66,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     public static final String HOURLY_FORECAST = "HOURLY_FORECAST";
     private Forecast mForecast;
 
-    @Bind(R.id.timeLabel)
-    TextView mTimeLabel;
-    @Bind(R.id.temperatureLabel)
-    TextView mTemperatureLabel;
-    @Bind(R.id.humidityValue)
-    TextView mHumidityValue;
-    @Bind(R.id.precipValue)
-    TextView mPrecipValue;
-    @Bind(R.id.summaryLabel)
-    TextView mSummaryLabel;
-    @Bind(R.id.iconImageView)
-    ImageView mIconImageView;
-    @Bind(R.id.refreshImageView)
-    ImageView mRefreshImageView;
-    @Bind(R.id.progressBar)
-    ProgressBar mProgressBar;
-    @Bind(R.id.locationLabel)
-    EditText mLocationLabel;
+    @Bind(R.id.timeLabel) TextView mTimeLabel;
+    @Bind(R.id.temperatureLabel) TextView mTemperatureLabel;
+    @Bind(R.id.humidityValue) TextView mHumidityValue;
+    @Bind(R.id.precipValue) TextView mPrecipValue;
+    @Bind(R.id.summaryLabel) TextView mSummaryLabel;
+    @Bind(R.id.iconImageView) ImageView mIconImageView;
+    @Bind(R.id.refreshImageView) ImageView mRefreshImageView;
+    @Bind(R.id.progressBar) ProgressBar mProgressBar;
+    @Bind(R.id.toolbar) Toolbar mToolbar;
 
     private double latitude;
     private double longitude;
@@ -96,39 +90,35 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         mProgressBar.setVisibility(View.INVISIBLE);
 
+        setSupportActionBar(mToolbar);
+
         buildGoogleApiClient();
         if (mGoogleApiClient != null) {
             mGoogleApiClient.connect();
-            checkPermissions();
+            getLocation();
         }
         mRefreshImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                checkPermissions();
+                getLocation();
             }
         });
-        mLocationLabel.setOnKeyListener(new View.OnKeyListener() {
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
-                        (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    // Perform action on key press
-                    Toast.makeText(getApplicationContext(),mLocationLabel.getText().toString(),Toast.LENGTH_SHORT).show();
-                    getLocationFromUser(mLocationLabel.getText().toString());
-                    return true;
-                }
-                return false;
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(),SearchActivity.class));
             }
         });
 
     }
 
     public void getLocationFromUser(String location) {
-        // TODO Parse string location to latitude and longitude using geocoding api
+        // TODO Use latitude and longitude to display city using geocoding api
 
     }
 
-    private void checkPermissions() {
+    private void getLocation() {
         int permission;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             permission = checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION);
@@ -183,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     private void getForecast(double newLatitude, double newLongitude) {
 
-        Log.d("MainActivity.getForecas","Latitude:" + newLatitude + ", longitude: " + newLongitude);
+        Log.d("Main","Latitude:" + newLatitude + ", longitude: " + newLongitude);
 
         if (isNetworkAvailable()) {
 
@@ -435,7 +425,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     @Override
     public void onConnected(Bundle bundle) {
-        checkPermissions();
+        getLocation();
     }
 
     @Override
@@ -452,7 +442,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case 1:
-                checkPermissions();
+                getLocation();
                 break;
         }
     }
