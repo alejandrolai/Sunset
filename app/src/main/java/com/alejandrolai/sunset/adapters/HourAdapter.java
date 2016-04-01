@@ -51,11 +51,6 @@ public class HourAdapter extends RecyclerView.Adapter<HourAdapter.HourViewHolder
 
         @Override
         public void onClick(View v) {
-            String time = mTimeLabel.toString();
-            String temperature = mSummaryLabel.toString();
-            String summary = mTemperatureLavel.toString();
-            String message = String.format("At %s it will be %s and %s", time, temperature, summary);
-            Toast.makeText(mContext,message,Toast.LENGTH_SHORT).show();
         }
     }
     @Override

@@ -14,15 +14,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -35,11 +32,16 @@ import com.alejandrolai.sunset.weather.Day;
 import com.alejandrolai.sunset.weather.Forecast;
 import com.alejandrolai.sunset.weather.Hour;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -62,6 +64,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     public static final String FORECASTIO_API_KEY = BuildConfig.FORECASTIO_API_KEY;
     public static final String GOOGLE_MAPS_API_KEY = BuildConfig.GOOGLE_MAPS_API_KEY;
 
+    int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
+
     public static final String TAG = MainActivity.class.getSimpleName();
     public static final String DAILY_FORECAST = "DAILY_FORECAST";
     public static final String HOURLY_FORECAST = "HOURLY_FORECAST";
@@ -76,12 +80,17 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     @Bind(R.id.refreshImageView) ImageView mRefreshImageView;
     @Bind(R.id.progressBar) ProgressBar mProgressBar;
     @Bind(R.id.toolbar) Toolbar mToolbar;
+    @Bind(R.id.locationLabel) TextView mLocation1;
+    //@Bind(R.id.locationLabelForecast) TextView mLocation2;
 
     private double latitude;
     private double longitude;
+    private String location;
 
     protected GoogleApiClient mGoogleApiClient;
     protected Location mLastLocation;
+
+    private boolean userInput = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +105,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         buildGoogleApiClient();
         if (mGoogleApiClient != null) {
             mGoogleApiClient.connect();
-            getLocation();
+            if (!userInput) {
+                getLocation();
+            }
         }
         mRefreshImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -108,7 +119,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(),SearchActivity.class));
+                //startActivity(new Intent(getApplicationContext(),SearchActivity.class));
+                try {
+                    Intent intent =
+                            new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
+                                    .build(MainActivity.this);
+                    startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
+                } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -250,7 +269,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         mHumidityValue.setText(Double.toString(current.getHumidity()));
         mPrecipValue.setText(current.getPrecipChance() + "%");
         mSummaryLabel.setText(current.getSummary());
-
+        mLocation1.setText(location);
+        //mLocation2.setText(location);
 
         Drawable drawable = getResources().getDrawable(current.getIconId());
         mIconImageView.setImageDrawable(drawable);
@@ -424,7 +444,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 .build();
     }
 
-
     @Override
     public void onConnected(Bundle bundle) {
         getLocation();
@@ -446,6 +465,25 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             case 1:
                 getLocation();
                 break;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                Place place = PlaceAutocomplete.getPlace(this, data);
+                double longitude = place.getLatLng().longitude;
+                double latitude = place.getLatLng().latitude;
+                location = place.getName().toString();
+                getForecast(latitude, longitude);
+            } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
+                Status status = PlaceAutocomplete.getStatus(this, data);
+                Log.i(TAG, status.getStatusMessage());
+
+            } else if (resultCode == RESULT_CANCELED) {
+                // The user canceled the operation.
+            }
         }
     }
 }
