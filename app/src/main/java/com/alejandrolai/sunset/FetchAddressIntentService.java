@@ -52,7 +52,7 @@ public class FetchAddressIntentService extends IntentService {
         // send an error error message and return.
         if (location == null) {
             errorMessage = "no data provided";
-            deliverResultToReceiver(Constants.FAILURE_RESULT, errorMessage);
+            deliverResultToReceiver(1, errorMessage);
             return;
         }
 
@@ -84,12 +84,12 @@ public class FetchAddressIntentService extends IntentService {
                 errorMessage = "no address found";
                 Log.e(TAG, errorMessage);
             }
-            deliverResultToReceiver(Constants.FAILURE_RESULT, errorMessage);
+            deliverResultToReceiver(1, errorMessage);
         } else {
             Address address = addresses.get(0);
             String city = address.getLocality();
             String state = address.getAdminArea();
-            deliverResultToReceiver(Constants.SUCCESS_RESULT, city + ", " + state);
+            deliverResultToReceiver(0, city + ", " + state);
         }
     }
 
@@ -98,7 +98,7 @@ public class FetchAddressIntentService extends IntentService {
      */
     private void deliverResultToReceiver(int resultCode, String message) {
         Bundle bundle = new Bundle();
-        bundle.putString(Constants.RESULT_DATA_KEY, message);
+        bundle.putString("result", message);
         mReceiver.send(resultCode, bundle);
     }
 }

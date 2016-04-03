@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.location.Geocoder;
@@ -18,9 +19,12 @@ import android.os.Handler;
 import android.os.ResultReceiver;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -28,7 +32,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alejandrolai.sunset.BuildConfig;
-import com.alejandrolai.sunset.Constants;
 import com.alejandrolai.sunset.FetchAddressIntentService;
 import com.alejandrolai.sunset.R;
 import com.alejandrolai.sunset.weather.Current;
@@ -45,6 +48,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -65,14 +69,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     public static final String FORECASTIO_API_KEY = BuildConfig.FORECASTIO_API_KEY;
-
     public static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
+    private static final String PREFS_FILE = "com.alejandrolai.sunset.preferences";
+
+    private SharedPreferences mSharedPreferences;
+    private SharedPreferences.Editor mEditor;
 
     public static final String TAG = MainActivity.class.getSimpleName();
     public static final String DAILY_FORECAST = "DAILY_FORECAST";
     public static final String HOURLY_FORECAST = "HOURLY_FORECAST";
-    protected static final String ADDRESS_REQUESTED_KEY = "address-request-pending";
-    protected static final String LOCATION_ADDRESS_KEY = "location-address";
     private Forecast mForecast;
 
     @Bind(R.id.timeLabel) TextView mTimeLabel;
@@ -86,15 +91,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     @Bind(R.id.toolbar) Toolbar mToolbar;
     @Bind(R.id.locationLabel) TextView mLocationLabel;
 
-    private double latitude;
-    private double longitude;
+    private LatLng mUserRequestedLatLng;
+    private LatLng mUserLocationLatLng;
+
     private String mUserEnteredLocation;
     protected String mUserLocation;
 
     protected GoogleApiClient mGoogleApiClient;
     protected Location mLastLocation;
 
-    private boolean mAddressRequested;
+    private boolean mLocationRequested = false;
 
     /**
      * Receiver registered with this activity to get the response from FetchAddressIntentService.
@@ -110,23 +116,25 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         mProgressBar.setVisibility(View.INVISIBLE);
 
         setSupportActionBar(mToolbar);
+        mSharedPreferences = getSharedPreferences(PREFS_FILE, Context.MODE_PRIVATE);
 
         buildGoogleApiClient();
         if (mGoogleApiClient != null) {
             mGoogleApiClient.connect();
-            if (!mAddressRequested) {
-                getLocation();
-            }
+            getLocation();
         }
         mUserEnteredLocation = "";
         mUserLocation = "";
-        mAddressRequested = false;
-        updateValuesFromBundle(savedInstanceState);
+        //updateValuesFromBundle(savedInstanceState);
 
         mRefreshImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getLocation();
+                if (mLocationRequested) {
+                    getForecast(mUserRequestedLatLng);
+                } else {
+                    getLocation();
+                }
             }
         });
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -134,6 +142,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             @Override
             public void onClick(View view) {
                 try {
+                    mLocationRequested = true;
                     Intent intent =
                             new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
                                     .build(MainActivity.this);
@@ -145,36 +154,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         });
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        // Save whether the address has been requested.
-        savedInstanceState.putBoolean(ADDRESS_REQUESTED_KEY, mAddressRequested);
-
-        // Save the address string.
-        savedInstanceState.putString(LOCATION_ADDRESS_KEY, mUserLocation);
-        super.onSaveInstanceState(savedInstanceState);
-    }
-
-
-    /**
-     * Updates fields based on data stored in the bundle.
-     */
-    private void updateValuesFromBundle(Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
-            // Check savedInstanceState to see if the address was previously requested.
-            if (savedInstanceState.keySet().contains(ADDRESS_REQUESTED_KEY)) {
-                mAddressRequested = savedInstanceState.getBoolean(ADDRESS_REQUESTED_KEY);
-            }
-            // Check savedInstanceState to see if the location address string was previously found
-            // and stored in the Bundle. If it was found, display the address string in the UI.
-            if (savedInstanceState.keySet().contains(LOCATION_ADDRESS_KEY)) {
-                mUserLocation = savedInstanceState.getString(LOCATION_ADDRESS_KEY);
-                mLocationLabel.setText(mUserLocation);
-            }
-        }
-    }
-
     private void getLocation() {
+        mLocationRequested = false;
         int permission;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             permission = checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION);
@@ -207,31 +188,30 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 // Locations granted, get location
                 mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
                 if (mLastLocation != null) {
-                    latitude = mLastLocation.getLatitude();
-                    longitude = mLastLocation.getLongitude();
+                    mUserLocationLatLng = new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude());
                 }
             }
         } else {
             // API is < 23 so permissions were granted at installation
             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            latitude = mLastLocation.getLatitude();
-            longitude = mLastLocation.getLongitude();
+            mUserLocationLatLng = new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude());
         }
-        if (latitude != 0 && longitude != 0) {
-            getForecast(latitude, longitude);
+        if (mUserLocationLatLng != null) {
+            getForecast(mUserLocationLatLng);
+        } else {
+            Toast.makeText(this,"No location",Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void getForecast(double newLatitude, double newLongitude) {
-        if (!mAddressRequested) {
+    private void getForecast(LatLng latLng) {
+        if (!mLocationRequested) {
             // get Location name
             startIntentService();
         }
-        Log.d("Main","Latitude:" + newLatitude + ", longitude: " + newLongitude);
 
         if (isNetworkAvailable()) {
 
-            String url = "https://api.forecast.io/forecast/" + FORECASTIO_API_KEY + "/" + newLatitude + "," + newLongitude;
+            String url = "https://api.forecast.io/forecast/" + FORECASTIO_API_KEY + "/" + latLng.latitude + "," + latLng.longitude;
 
             toggleRefresh();
             OkHttpClient client = new OkHttpClient();
@@ -276,7 +256,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                     } catch (IOException | JSONException e) {
                         e.printStackTrace();
                     }
-
                 }
             });
         } else {
@@ -296,21 +275,29 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     private void updateDisplay() {
         if (mForecast != null) {
-            Current current = mForecast.getCurrent();
-            mTemperatureLabel.setText(String.format("%d", (long) current.getTemperature()));
-            mTimeLabel.setText("At " + current.getFormattedTime() + " it will be");
-            mHumidityValue.setText(Double.toString(current.getHumidity()));
-            mPrecipValue.setText(current.getPrecipChance() + "%");
-            mSummaryLabel.setText(current.getSummary());
+            if (mLocationRequested) {
+                Current current = mForecast.getCurrent();
+                mTemperatureLabel.setText(Integer.toString(current.getTemperature()));
+                mTimeLabel.setText("At " + current.getFormattedTime() + " it will be");
+                mHumidityValue.setText(Double.toString(current.getHumidity()));
+                mPrecipValue.setText(current.getPrecipChance() + "%");
+                mSummaryLabel.setText(current.getSummary());
+                Drawable drawable = ContextCompat.getDrawable(getApplicationContext(), current.getIconId());
+                mIconImageView.setImageDrawable(drawable);
 
-            Drawable drawable = getResources().getDrawable(current.getIconId());
-            mIconImageView.setImageDrawable(drawable);
-        }
+                mLocationLabel.setText(mUserEnteredLocation);
+            } else {
+                Current current = mForecast.getCurrent();
+                mTemperatureLabel.setText(Integer.toString(current.getTemperature()));
+                mTimeLabel.setText("At " + current.getFormattedTime() + " it will be");
+                mHumidityValue.setText(Double.toString(current.getHumidity()));
+                mPrecipValue.setText(current.getPrecipChance() + "%");
+                mSummaryLabel.setText(current.getSummary());
+                Drawable drawable = ContextCompat.getDrawable(getApplicationContext(),current.getIconId());
+                mIconImageView.setImageDrawable(drawable);
 
-        if (!mUserEnteredLocation.equals("")) {
-            mLocationLabel.setText(mUserEnteredLocation);
-        } else {
-            mLocationLabel.setText(mUserLocation);
+                mLocationLabel.setText(mUserLocation);
+            }
         }
     }
 
@@ -417,9 +404,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     @Override
     public void onLocationChanged(Location location) {
         if (location != null) {
-            latitude = location.getLatitude();
-            longitude = location.getLongitude();
-            getForecast(latitude,longitude);
+            mUserRequestedLatLng = new LatLng(location.getLatitude(),location.getLongitude());
+            getForecast(mUserRequestedLatLng);
             LocationServices.FusedLocationApi.removeLocationUpdates(
                     mGoogleApiClient, this);
         }
@@ -462,7 +448,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     @Override
     public void onConnected(Bundle bundle) {
-        getLocation();
+        if (!mLocationRequested) {
+            getLocation();
+        }
     }
 
     @Override
@@ -489,10 +477,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 Place place = PlaceAutocomplete.getPlace(this, data);
-                double longitude = place.getLatLng().longitude;
-                double latitude = place.getLatLng().latitude;
                 mUserEnteredLocation = place.getName().toString();
-                getForecast(latitude, longitude);
+                mUserRequestedLatLng = new LatLng(place.getLatLng().latitude,place.getLatLng().longitude);
+                getForecast(mUserRequestedLatLng);
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                 Status status = PlaceAutocomplete.getStatus(this, data);
                 Log.i(TAG, status.getStatusMessage());
@@ -512,7 +499,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         // Create an intent for passing to the intent service responsible for fetching the address.
         Intent intent = new Intent(this, FetchAddressIntentService.class);
 
-        if (longitude != 0 && latitude != 0 && Geocoder.isPresent()) {
+        if (mUserLocationLatLng != null && Geocoder.isPresent()) {
             intent.putExtra("receiver", mResultReceiver);
             intent.putExtra("location",mLastLocation);
         }
@@ -537,9 +524,30 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         @Override
         protected void onReceiveResult(int resultCode, Bundle resultData) {
             // Display the address string or an error message sent from the intent service.
-            mUserLocation = resultData.getString(Constants.RESULT_DATA_KEY);
-            mAddressRequested = false;
+            mUserLocation = resultData.getString("result");
+            updateDisplay();
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 }
