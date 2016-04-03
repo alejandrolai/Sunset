@@ -45,13 +45,13 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="60dp"
-        android:text="San Francisco"
+        android:layout_marginBottom="55dp"
         android:textSize="24sp"
         android:id="@+id/locationLabel"
         android:textColor="@android:color/white"
         android:layout_above="@+id/timeLabel"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        />
 
     <ImageView
         android:layout_width="wrap_content"
@@ -60,7 +60,9 @@
         android:layout_alignBottom="@+id/locationLabel"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:src="@mipmap/cloudy_night" />
+        android:src="@mipmap/cloudy_night"
+        android:layout_marginRight="5dp"
+        android:layout_marginLeft="5dp"/>
 
     <LinearLayout
         android:orientation="horizontal"

@@ -1,7 +1,6 @@
 package com.alejandrolai.sunset.adapters;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,7 +56,7 @@ public class DayAdapter extends BaseAdapter {
 
         Day day = mDays[position];
         holder.iconImageView.setImageResource(day.getIconId());
-        holder.temperatureLabel.setText(day.getTemperatureMax()+ "");
+        holder.temperatureLabel.setText(Integer.toString(day.getTemperatureMax()));
         if (position != 0) {
             holder.dayLabel.setText(day.getDayOfTheWeek());
         } else {

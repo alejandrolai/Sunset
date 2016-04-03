@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.alejandrolai.sunset.R;
 import com.alejandrolai.sunset.weather.Hour;
@@ -18,10 +17,8 @@ import com.alejandrolai.sunset.weather.Hour;
 public class HourAdapter extends RecyclerView.Adapter<HourAdapter.HourViewHolder>{
 
     private Hour[] mHours;
-    private Context mContext;
 
-    public HourAdapter(Context context, Hour[] hours) {
-        mContext = context;
+    public HourAdapter(Hour[] hours) {
         mHours = hours;
     }
 
@@ -45,7 +42,7 @@ public class HourAdapter extends RecyclerView.Adapter<HourAdapter.HourViewHolder
         public void bindHour(Hour hour) {
             mTimeLabel.setText(hour.getHour());
             mSummaryLabel.setText(hour.getSummary());
-            mTemperatureLavel.setText(hour.getTemperature() + "");
+            mTemperatureLavel.setText(Integer.toString(hour.getTemperature()));
             mIconImageView.setImageResource(hour.getIconId());
         }
 
@@ -57,8 +54,7 @@ public class HourAdapter extends RecyclerView.Adapter<HourAdapter.HourViewHolder
     public HourViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.hourly_list_item,parent,false);
-        HourViewHolder viewHolder = new HourViewHolder(view);
-        return viewHolder;
+        return new HourViewHolder(view);
     }
 
     @Override

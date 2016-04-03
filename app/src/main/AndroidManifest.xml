@@ -41,7 +41,10 @@
             android:value="@integer/google_play_services_version"/>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyD3Jk6i4hvvsBtH6COlM1nM3eCNeWYnj5E" />
+            android:value="AIzaSyB-qZiaNMAa8J0ZOY4unAf_gCO_5h0vyt8" />
+        <service
+            android:name=".FetchAddressIntentService"
+            android:exported="false"/>
     </application>
 
 </manifest>
