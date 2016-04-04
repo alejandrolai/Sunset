@@ -20,6 +20,7 @@ import android.os.ResultReceiver;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -188,18 +189,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 // Locations granted, get location
                 mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
                 if (mLastLocation != null) {
-                    mUserLocationLatLng = new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude());
+                    mUserLocationLatLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
                 }
             }
         } else {
             // API is < 23 so permissions were granted at installation
             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            mUserLocationLatLng = new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude());
+            mUserLocationLatLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
         }
         if (mUserLocationLatLng != null) {
             getForecast(mUserLocationLatLng);
-        } else {
-            Toast.makeText(this,"No location",Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -293,7 +292,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 mHumidityValue.setText(Double.toString(current.getHumidity()));
                 mPrecipValue.setText(current.getPrecipChance() + "%");
                 mSummaryLabel.setText(current.getSummary());
-                Drawable drawable = ContextCompat.getDrawable(getApplicationContext(),current.getIconId());
+                Drawable drawable = ContextCompat.getDrawable(getApplicationContext(), current.getIconId());
                 mIconImageView.setImageDrawable(drawable);
 
                 mLocationLabel.setText(mUserLocation);
@@ -404,7 +403,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     @Override
     public void onLocationChanged(Location location) {
         if (location != null) {
-            mUserRequestedLatLng = new LatLng(location.getLatitude(),location.getLongitude());
+            mUserRequestedLatLng = new LatLng(location.getLatitude(), location.getLongitude());
             getForecast(mUserRequestedLatLng);
             LocationServices.FusedLocationApi.removeLocationUpdates(
                     mGoogleApiClient, this);
@@ -478,7 +477,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             if (resultCode == RESULT_OK) {
                 Place place = PlaceAutocomplete.getPlace(this, data);
                 mUserEnteredLocation = place.getName().toString();
-                mUserRequestedLatLng = new LatLng(place.getLatLng().latitude,place.getLatLng().longitude);
+                mUserRequestedLatLng = new LatLng(place.getLatLng().latitude, place.getLatLng().longitude);
                 getForecast(mUserRequestedLatLng);
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                 Status status = PlaceAutocomplete.getStatus(this, data);
@@ -486,7 +485,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
             } else if (resultCode == RESULT_CANCELED) {
                 // The user canceled the operation.
-                Toast.makeText(getApplicationContext(),"Canceled",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Canceled", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -501,7 +500,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         if (mUserLocationLatLng != null && Geocoder.isPresent()) {
             intent.putExtra("receiver", mResultReceiver);
-            intent.putExtra("location",mLastLocation);
+            intent.putExtra("location", mUserLocationLatLng);
+            Log.d("Main", "Latitude: " + mUserLocationLatLng.latitude + ", Longitude: " + mUserLocationLatLng.longitude);
+        } else {
         }
 
         // Start the service. If the service isn't already running, it is instantiated and started
@@ -518,14 +519,20 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         public AddressResultReceiver(Handler handler) {
             super(handler);
         }
+
         /**
-         *  Receives data sent from FetchAddressIntentService and updates the UI in MainActivity.
+         * Receives data sent from FetchAddressIntentService and updates the UI in MainActivity.
          */
         @Override
         protected void onReceiveResult(int resultCode, Bundle resultData) {
             // Display the address string or an error message sent from the intent service.
-            mUserLocation = resultData.getString("result");
-            updateDisplay();
+            if (resultCode == 0) {
+                mUserLocation = resultData.getString("result");
+                updateDisplay();
+            } else {
+                Toast.makeText(getApplicationContext(), "location name not found", Toast.LENGTH_SHORT).show();
+            }
+
         }
     }
 
@@ -543,8 +550,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_current_location) {
+            getLocation();
             return true;
         }
 

@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Log;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
@@ -46,7 +48,7 @@ public class FetchAddressIntentService extends IntentService {
         }
 
         // Get the location passed to this service through an extra.
-        Location location = intent.getParcelableExtra("location");
+        LatLng location = intent.getParcelableExtra("location");
 
         // Make sure that the location data was really sent over through an extra. If it wasn't,
         // send an error error message and return.
@@ -66,13 +68,13 @@ public class FetchAddressIntentService extends IntentService {
             // surrounding the given latitude and longitude. The results are a best guess and are
             // not guaranteed to be accurate.
             addresses = geocoder.getFromLocation(
-                    location.getLatitude(),
-                    location.getLongitude(),
-                    // In this sample, we get just a single address.
+                    location.latitude,
+                    location.longitude,
                     1);
         } catch (IOException ioException) {
             // Catch network or other I/O problems.
             errorMessage = "Service not available";
+            Log.e("FetchAIS",ioException.toString());
         } catch (IllegalArgumentException illegalArgumentException) {
             // Catch invalid latitude or longitude values.
             errorMessage = "Invalid latlng";
