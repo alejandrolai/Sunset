@@ -9,14 +9,15 @@ import java.util.Date;
 /**
  * Created by Alejandro on 3/10/16.
  */
-public class Hour implements Parcelable{
+public class Hour implements Parcelable {
     private long mTime;
     private String mSummary;
     private double mTemperature;
     private String mIcon;
     private String mTimezone;
 
-    public Hour(){}
+    public Hour() {
+    }
 
     public long getTime() {
         return mTime;
@@ -35,7 +36,7 @@ public class Hour implements Parcelable{
     }
 
     public int getTemperature() {
-        return (int)Math.round(mTemperature);
+        return (int) Math.round(mTemperature);
     }
 
     public void setTemperature(double temperature) {
@@ -88,6 +89,7 @@ public class Hour implements Parcelable{
         mIcon = in.readString();
         mTimezone = in.readString();
     }
+
     public static final Creator<Hour> CREATOR = new Creator<Hour>() {
         @Override
         public Hour createFromParcel(Parcel source) {

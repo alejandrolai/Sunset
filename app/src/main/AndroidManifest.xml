@@ -28,11 +28,13 @@
         <activity android:name=".ui.DailyForecastActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
+                android:screenOrientation="portrait"
                 android:value="com.alejandrolai.sunset.ui.MainActivity" />
         </activity>
         <activity android:name=".ui.HourlyForecastActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
+                android:screenOrientation="portrait"
                 android:value="com.alejandrolai.sunset.ui.MainActivity" />
         </activity>
 

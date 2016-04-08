@@ -6,7 +6,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.location.Geocoder;
@@ -20,10 +19,8 @@ import android.os.ResultReceiver;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -43,7 +40,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
@@ -71,12 +67,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     public static final String FORECASTIO_API_KEY = BuildConfig.FORECASTIO_API_KEY;
     public static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
-    private static final String PREFS_FILE = "com.alejandrolai.sunset.preferences";
-
-    private SharedPreferences mSharedPreferences;
-    private SharedPreferences.Editor mEditor;
-
-    public static final String TAG = MainActivity.class.getSimpleName();
     public static final String DAILY_FORECAST = "DAILY_FORECAST";
     public static final String HOURLY_FORECAST = "HOURLY_FORECAST";
     private Forecast mForecast;
@@ -117,7 +107,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         mProgressBar.setVisibility(View.INVISIBLE);
 
         setSupportActionBar(mToolbar);
-        mSharedPreferences = getSharedPreferences(PREFS_FILE, Context.MODE_PRIVATE);
 
         buildGoogleApiClient();
         if (mGoogleApiClient != null) {
@@ -126,7 +115,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         }
         mUserEnteredLocation = "";
         mUserLocation = "";
-        //updateValuesFromBundle(savedInstanceState);
 
         mRefreshImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -139,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             }
         });
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        fab.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 try {
@@ -161,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             permission = checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION);
             if (permission != PackageManager.PERMISSION_GRANTED) {
-                if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                if (!shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION)) {
                     showMessage("Sunset needs to access your location",
                             new DialogInterface.OnClickListener() {
                                 @Override
@@ -174,19 +162,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                                             }
                                             break;
                                         case -2:
-                                            showMessage("Sunset won't be able to access your location's weather", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-
-                                                }
-                                            });
                                             break;
                                     }
+                                    dialog.dismiss();
                                 }
                             });
                 }
             } else {
-                // Locations granted, get location
+                // Locations granted before, get location
                 mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
                 if (mLastLocation != null) {
                     mUserLocationLatLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
@@ -240,7 +223,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                     });
                     try {
                         String jsonData = response.body().string();
-                        Log.v(TAG, jsonData);
                         if (response.isSuccessful()) {
                             mForecast = parseForecastDetails(jsonData);
                             runOnUiThread(new Runnable() {
@@ -480,9 +462,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 mUserRequestedLatLng = new LatLng(place.getLatLng().latitude, place.getLatLng().longitude);
                 getForecast(mUserRequestedLatLng);
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
-                Status status = PlaceAutocomplete.getStatus(this, data);
-                Log.i(TAG, status.getStatusMessage());
-
+                Toast.makeText(getApplicationContext(), "Error getting location", Toast.LENGTH_SHORT).show();
             } else if (resultCode == RESULT_CANCELED) {
                 // The user canceled the operation.
                 Toast.makeText(getApplicationContext(), "Canceled", Toast.LENGTH_SHORT).show();
@@ -501,8 +481,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         if (mUserLocationLatLng != null && Geocoder.isPresent()) {
             intent.putExtra("receiver", mResultReceiver);
             intent.putExtra("location", mUserLocationLatLng);
-            Log.d("Main", "Latitude: " + mUserLocationLatLng.latitude + ", Longitude: " + mUserLocationLatLng.longitude);
-        } else {
         }
 
         // Start the service. If the service isn't already running, it is instantiated and started
@@ -557,4 +535,5 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         return super.onOptionsItemSelected(item);
     }
+
 }

@@ -19,13 +19,14 @@ android {
     }
     buildTypes.each {
         it.buildConfigField 'String', 'FORECASTIO_API_KEY', ForecastIoApiKey
-        it.buildConfigField 'String', 'GOOGLE_MAPS_API_KEY', GoogleMapsApiKey
+    }
+    lintOptions {
+        disable 'InvalidPackage'
     }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.2.0'
     compile 'com.android.support:recyclerview-v7:23.2.0'
     compile 'com.android.support:design:23.2.0'

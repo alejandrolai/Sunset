@@ -37,7 +37,7 @@ public class Day implements Parcelable {
     }
 
     public int getTemperatureMax() {
-        return (int)Math.round(mTemperatureMax);
+        return (int) Math.round(mTemperatureMax);
     }
 
     public void setTemperatureMax(double temperatureMax) {
@@ -103,4 +103,4 @@ public class Day implements Parcelable {
             return new Day[size];
         }
     };
- }
+}

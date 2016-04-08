@@ -1,6 +1,5 @@
 package com.alejandrolai.sunset.ui;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -39,9 +38,9 @@ public class DailyForecastActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         Parcelable[] parcelables = intent.getParcelableArrayExtra(MainActivity.DAILY_FORECAST);
-        mDays = Arrays.copyOf(parcelables,parcelables.length,Day[].class);
+        mDays = Arrays.copyOf(parcelables, parcelables.length, Day[].class);
 
-        DayAdapter adapter = new DayAdapter(this,mDays);
+        DayAdapter adapter = new DayAdapter(this, mDays);
 
         mListView.setAdapter(adapter);
         mListView.setEmptyView(mEmptyTextView);

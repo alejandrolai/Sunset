@@ -1,7 +1,5 @@
 package com.alejandrolai.sunset.weather;
 
-import com.alejandrolai.sunset.R;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
@@ -18,10 +16,6 @@ public class Current {
     private double mPrecipChance;
     private String mSummary;
     private String mTimeZone;
-
-    public String getmIcon() {
-        return mIcon;
-    }
 
     public void setIcon(String mIcon) {
         this.mIcon = mIcon;
@@ -47,7 +41,7 @@ public class Current {
     }
 
     public int getTemperature() {
-        return (int)Math.round(mTemperature);
+        return (int) Math.round(mTemperature);
     }
 
     public void setTemperature(double mTemperature) {
@@ -63,7 +57,7 @@ public class Current {
     }
 
     public int getPrecipChance() {
-        return (int)Math.round(mPrecipChance) * 100;
+        return (int) Math.round(mPrecipChance) * 100;
     }
 
     public void setPrecipChance(double mPrecipChance) {

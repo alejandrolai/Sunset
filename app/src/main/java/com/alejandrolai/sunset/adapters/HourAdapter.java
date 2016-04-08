@@ -1,6 +1,5 @@
 package com.alejandrolai.sunset.adapters;
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +13,7 @@ import com.alejandrolai.sunset.weather.Hour;
 /**
  * Created by Alejandro on 3/10/16.
  */
-public class HourAdapter extends RecyclerView.Adapter<HourAdapter.HourViewHolder>{
+public class HourAdapter extends RecyclerView.Adapter<HourAdapter.HourViewHolder> {
 
     private Hour[] mHours;
 
@@ -22,7 +21,7 @@ public class HourAdapter extends RecyclerView.Adapter<HourAdapter.HourViewHolder
         mHours = hours;
     }
 
-    public class HourViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class HourViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public TextView mTimeLabel;
         public TextView mSummaryLabel;
@@ -50,10 +49,11 @@ public class HourAdapter extends RecyclerView.Adapter<HourAdapter.HourViewHolder
         public void onClick(View v) {
         }
     }
+
     @Override
     public HourViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.hourly_list_item,parent,false);
+                .inflate(R.layout.hourly_list_item, parent, false);
         return new HourViewHolder(view);
     }
 

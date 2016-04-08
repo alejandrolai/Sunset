@@ -4,10 +4,8 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
-import android.location.Location;
 import android.os.Bundle;
 import android.os.ResultReceiver;
-import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -74,17 +72,15 @@ public class FetchAddressIntentService extends IntentService {
         } catch (IOException ioException) {
             // Catch network or other I/O problems.
             errorMessage = "Service not available";
-            Log.e("FetchAIS",ioException.toString());
         } catch (IllegalArgumentException illegalArgumentException) {
             // Catch invalid latitude or longitude values.
             errorMessage = "Invalid latlng";
         }
 
         // Handle case where no address was found.
-        if (addresses == null || addresses.size()  == 0) {
+        if (addresses == null || addresses.size() == 0) {
             if (errorMessage.isEmpty()) {
                 errorMessage = "no address found";
-                Log.e(TAG, errorMessage);
             }
             deliverResultToReceiver(1, errorMessage);
         } else {

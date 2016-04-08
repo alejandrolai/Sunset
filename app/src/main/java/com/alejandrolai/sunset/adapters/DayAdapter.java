@@ -23,6 +23,7 @@ public class DayAdapter extends BaseAdapter {
         mContext = context;
         mDays = days;
     }
+
     @Override
     public int getCount() {
         return mDays.length;
