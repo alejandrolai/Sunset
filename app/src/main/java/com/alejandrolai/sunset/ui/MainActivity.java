@@ -528,9 +528,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if (id == R.id.action_current_location) {
-            getLocation();
-            return true;
+        switch (id) {
+            case R.id.action_current_location:
+                getLocation();
+                break;
+            default:
+                break;
         }
 
         return super.onOptionsItemSelected(item);
