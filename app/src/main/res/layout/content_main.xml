@@ -14,25 +14,34 @@
     tools:context=".ui.MainActivity"
     tools:showIn="@layout/activity_main">
 
+    <ImageView
+        android:id="@+id/refreshImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:src="@mipmap/refresh"/>
+
+    <ImageView
+        android:id="@+id/iconImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/locationLabel"
+        android:layout_toLeftOf="@+id/locationLabel"
+        android:layout_alignParentStart="true"
+        android:padding="5dp"
+        android:src="@mipmap/cloudy_night"/>
+
     <TextView
-        android:id="@+id/temperatureLabel"
+        android:id="@+id/locationLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:text="--"
+        android:layout_above="@+id/timeLabel"
+        android:layout_marginBottom="55dp"
         android:textColor="@android:color/white"
-        android:textSize="150sp"/>
-
-    <TextView
-        android:id="@+id/degree"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/temperatureLabel"
-        android:layout_toRightOf="@+id/temperatureLabel"
-        android:text="°"
-        android:textColor="#80ffffff"
-        android:textSize="150sp"/>
+        android:textSize="24sp"
+        />
 
     <TextView
         android:id="@+id/timeLabel"
@@ -45,27 +54,25 @@
         android:textSize="18sp"/>
 
     <TextView
-        android:id="@+id/locationLabel"
+        android:id="@+id/temperatureLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/timeLabel"
-        android:layout_toEndOf="@+id/iconImageView"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="55dp"
+        android:layout_centerVertical="true"
+        android:text="@string/dash"
         android:textColor="@android:color/white"
-        android:textSize="24sp"
-        />
+        android:textSize="150sp"/>
 
-    <ImageView
-        android:id="@+id/iconImageView"
+    <TextView
+        android:id="@+id/degree"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/locationLabel"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
-        android:src="@mipmap/cloudy_night"/>
+        android:layout_alignTop="@+id/temperatureLabel"
+        android:layout_toEndOf="@+id/temperatureLabel"
+        android:text="@string/degree"
+
+        android:textColor="#80ffffff"
+        android:textSize="150sp"/>
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -74,7 +81,8 @@
         android:layout_below="@+id/temperatureLabel"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:baselineAligned="false">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -87,7 +95,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
-                android:text="HUMIDITY"
+                android:text="@string/humidity"
                 android:textColor="#80ffffff"/>
 
             <TextView
@@ -111,7 +119,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
-                android:text="RAIN/SNOW"
+                android:text="@string/rain_snow"
                 android:textColor="#80ffffff"/>
 
             <TextView
@@ -119,7 +127,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
-                android:text="--"
+                android:text="@string/dash"
                 android:textColor="@android:color/white"
                 android:textSize="24sp"/>
 
@@ -133,17 +141,9 @@
         android:layout_below="@+id/linearLayout"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="40dp"
-        android:text="Getting current weather..."
+        android:text="@string/getting_current_weather"
         android:textColor="@android:color/white"
-        android:textSize="18dp"/>
-
-    <ImageView
-        android:id="@+id/refreshImageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:src="@mipmap/refresh"/>
+        android:textSize="18sp"/>
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -158,7 +158,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:orientation="horizontal">
 
         <Button
@@ -167,7 +167,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="#40ffffff"
-            android:text="HOURLY"
+            android:text="@string/hourly"
             android:textColor="#ffffff"/>
 
         <Button
@@ -177,7 +177,7 @@
             android:layout_marginLeft="2dp"
             android:layout_weight="1"
             android:background="#40ffffff"
-            android:text="7 DAILY"
+            android:text="@string/_7_daily"
             android:textColor="#ffffff"/>
     </LinearLayout>
 

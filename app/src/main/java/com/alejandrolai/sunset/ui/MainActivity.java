@@ -410,7 +410,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         new AlertDialog.Builder(MainActivity.this)
                 .setMessage(message)
                 .setPositiveButton("OK", listener)
-                .setNegativeButton("Cancel", listener)
+                .setNegativeButton(R.string.cancel, listener)
                 .create()
                 .show();
     }
@@ -462,10 +462,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 mUserRequestedLatLng = new LatLng(place.getLatLng().latitude, place.getLatLng().longitude);
                 getForecast(mUserRequestedLatLng);
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
-                Toast.makeText(getApplicationContext(), "Error getting location", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), R.string.error_getting_location, Toast.LENGTH_SHORT).show();
             } else if (resultCode == RESULT_CANCELED) {
                 // The user canceled the operation.
-                Toast.makeText(getApplicationContext(), "Canceled", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), R.string.canceled, Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -508,7 +508,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 mUserLocation = resultData.getString("result");
                 updateDisplay();
             } else {
-                Toast.makeText(getApplicationContext(), "location name not found", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), R.string.location_name_not_found, Toast.LENGTH_SHORT).show();
             }
 
         }
@@ -531,6 +531,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         switch (id) {
             case R.id.action_current_location:
                 getLocation();
+                break;
+            case R.id.action_settings:
+                startActivity(new Intent(MainActivity.this,SettingsActivity.class));
                 break;
             default:
                 break;

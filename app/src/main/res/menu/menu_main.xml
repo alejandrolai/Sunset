@@ -8,4 +8,9 @@
         android:title="@string/action_settings"
         android:icon="@mipmap/ic_my_location"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="50"
+        android:title="@string/settings"
+        app:showAsAction="never"/>
 </menu>
