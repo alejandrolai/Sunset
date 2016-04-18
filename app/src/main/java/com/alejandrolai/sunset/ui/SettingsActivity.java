@@ -15,7 +15,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.alejandrolai.sunset.R;
 
@@ -30,7 +29,7 @@ import com.alejandrolai.sunset.R;
  * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
  * API Guide</a> for more information on developing a Settings UI.
  */
-public class SettingsActivity extends AppCompatPreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener{
+public class SettingsActivity extends AppCompatPreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mEditor;
@@ -61,8 +60,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Sha
      */
     private void setupActionBar() {
 
-        getLayoutInflater().inflate(R.layout.toolbar, (ViewGroup)findViewById(android.R.id.content));
-        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        getLayoutInflater().inflate(R.layout.toolbar, (ViewGroup) findViewById(android.R.id.content));
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -107,7 +106,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Sha
             if (prefIndex >= 0) {
                 preference.setSummary(listPreference.getEntries()[prefIndex]);
                 mEditor = mSharedPreferences.edit();
-                mEditor.putString("units",listPreference.getEntryValues()[prefIndex].toString());
+                mEditor.putString("units", listPreference.getEntryValues()[prefIndex].toString());
                 mEditor.apply();
             }
         }

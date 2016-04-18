@@ -23,6 +23,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -96,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     private boolean mLocationRequested = false;
 
     private SharedPreferences mSharedPreferences;
-
+    String units = "";
 
     /**
      * Receiver registered with this activity to get the response from FetchAddressIntentService.
@@ -132,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             }
         });
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener( new View.OnClickListener() {
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 try {
@@ -148,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         });
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String units = mSharedPreferences.getString("units","Farenheit");
+        units = mSharedPreferences.getString("units", "Farenheit");
     }
 
     private void getLocation() {
@@ -312,7 +313,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             Hour hour = new Hour();
 
             hour.setSummary(jsonHour.getString("summary"));
-            hour.setTemperature(jsonHour.getDouble("temperature"));
+            if (units.equals("Celsius")) {
+                hour.setTemperature(getCelsius(jsonHour.getDouble("temperature")));
+            } else {
+                hour.setTemperature(jsonHour.getDouble("temperature"));
+            }
             hour.setIcon(jsonHour.getString("icon"));
             hour.setTime(jsonHour.getLong("time"));
             hour.setTimezone(timezone);
@@ -334,7 +339,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             Day day = new Day();
 
             day.setSummary(jsonDay.getString("summary"));
-            day.setTemperatureMax(jsonDay.getDouble("temperatureMax"));
+            if (units.equals("Celsius")) {
+                day.setTemperatureMax(getCelsius(jsonDay.getDouble("temperatureMax")));
+            } else {
+                day.setTemperatureMax(jsonDay.getDouble("temperatureMax"));
+            }
             day.setIcon(jsonDay.getString("icon"));
             day.setTime(jsonDay.getLong("time"));
             day.setTimezone(timezone);
@@ -355,9 +364,17 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         current.setIcon(currently.getString("icon"));
         current.setPrecipChance(currently.getDouble("precipProbability"));
         current.setSummary(currently.getString("summary"));
-        current.setTemperature(currently.getDouble("temperature"));
+        if (units.equals("Celsius")) {
+            current.setTemperature(getCelsius(currently.getDouble("temperature")));
+        } else {
+            current.setTemperature(currently.getDouble("temperature"));
+        }
         current.setTimeZone(timezone);
         return current;
+    }
+
+    public double getCelsius(double temp) {
+        return ((temp - 32) * (5.0 / 9.0));
     }
 
     private void alertUserAboutError() {
@@ -541,7 +558,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 getLocation();
                 break;
             case R.id.action_settings:
-                startActivity(new Intent(MainActivity.this,SettingsActivity.class));
+                startActivity(new Intent(MainActivity.this, SettingsActivity.class));
                 break;
             default:
                 break;
