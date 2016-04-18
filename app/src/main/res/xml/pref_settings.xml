@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ListPreference
+        android:icon="@mipmap/ic_thermometer"
+        android:defaultValue="Farenheit"
+        android:entries="@array/temperature_titles"
+        android:entryValues="@array/temperature_values"
+        android:key="temperature_units"
+        android:negativeButtonText="Cancel"
+        android:positiveButtonText="@null"
+        android:title="Units"
+        />
+
+</PreferenceScreen>

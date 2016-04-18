@@ -81,4 +81,13 @@
 
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="settings">Settings</string>
+    
+    <string-array name="temperature_values">
+        <item>Farenheit</item>
+        <item>Celsius</item>
+    </string-array>
+    <string-array name="temperature_titles">
+        <item>Farenheit(°F)</item>
+        <item>Celsius(°C)</item>
+    </string-array>
 </resources>

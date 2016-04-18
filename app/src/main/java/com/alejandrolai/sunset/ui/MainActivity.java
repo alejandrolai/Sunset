@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.location.Geocoder;
@@ -16,6 +17,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
@@ -93,6 +95,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     private boolean mLocationRequested = false;
 
+    private SharedPreferences mSharedPreferences;
+
+
     /**
      * Receiver registered with this activity to get the response from FetchAddressIntentService.
      */
@@ -141,6 +146,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 }
             }
         });
+
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String units = mSharedPreferences.getString("units","Farenheit");
     }
 
     private void getLocation() {
@@ -541,5 +549,4 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         return super.onOptionsItemSelected(item);
     }
-
 }
