@@ -23,7 +23,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -115,10 +114,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         setSupportActionBar(mToolbar);
 
         buildGoogleApiClient();
-        if (mGoogleApiClient != null) {
-            mGoogleApiClient.connect();
-            getLocation();
-        }
+
         mUserEnteredLocation = "";
         mUserLocation = "";
 
@@ -148,8 +144,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             }
         });
 
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        units = mSharedPreferences.getString("units", "Farenheit");
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient.connect();
+            getLocation();
+        }
     }
 
     private void getLocation() {
@@ -394,17 +392,20 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     @OnClick(R.id.dailyButton)
     public void startDailyActivity(View view) {
-        Intent intent = new Intent(this, DailyForecastActivity.class);
-        intent.putExtra(DAILY_FORECAST, mForecast.getDailyForecast());
-        startActivity(intent);
+        if (mUserRequestedLatLng != null || mUserLocationLatLng != null) {
+            Intent intent = new Intent(this, DailyForecastActivity.class);
+            intent.putExtra(DAILY_FORECAST, mForecast.getDailyForecast());
+            startActivity(intent);
+        }
     }
 
     @OnClick(R.id.hourlyButton)
     public void startHourlyActivity(View view) {
-        Intent intent = new Intent(this, HourlyForecastActivity.class);
-        intent.putExtra(HOURLY_FORECAST, mForecast.getHourlyForecast());
-        startActivity(intent);
-
+        if (mUserRequestedLatLng != null || mUserLocationLatLng != null) {
+            Intent intent = new Intent(this, HourlyForecastActivity.class);
+            intent.putExtra(HOURLY_FORECAST, mForecast.getHourlyForecast());
+            startActivity(intent);
+        }
     }
 
     @Override
@@ -421,6 +422,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     protected void onStart() {
         super.onStart();
         mGoogleApiClient.connect();
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        units = mSharedPreferences.getString("units", "Farenheit");
+        double latitude = Double.parseDouble(mSharedPreferences.getString("Location Latitude", "0"));
+        double longitude = Double.parseDouble(mSharedPreferences.getString("Location Longitude", "0"));
+        mUserRequestedLatLng = new LatLng(latitude, longitude);
+        mUserEnteredLocation = mSharedPreferences.getString("Location Name", "nothing");
+        if (latitude != 0.0 && longitude != 0.0) {
+            mLocationRequested = true;
+            getForecast(mUserRequestedLatLng);
+        }
     }
 
     @Override
@@ -429,6 +440,17 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
+        SharedPreferences.Editor mEditor = mSharedPreferences.edit();
+        if (mUserRequestedLatLng != null) {
+            mEditor.putString("Location Name",mUserEnteredLocation);
+            mEditor.putString("Location Latitude",Double.toString(mUserRequestedLatLng.latitude));
+            mEditor.putString("Location Longitude",Double.toString(mUserRequestedLatLng.longitude));
+
+        } else if (mUserLocationLatLng != null) {
+            mEditor.putString("Location Latitude",mUserLocationLatLng.latitude + "");
+            mEditor.putString("Location Longitude",mUserLocationLatLng.longitude + "");
+        }
+        mEditor.apply();
     }
 
     private void showMessage(String message, DialogInterface.OnClickListener listener) {

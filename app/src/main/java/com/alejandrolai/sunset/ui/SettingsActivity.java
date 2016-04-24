@@ -52,7 +52,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Sha
                 getResources().getDisplayMetrics());
 
         getListView().setPadding(horizontalMargin, topMargin, horizontalMargin, verticalMargin);
-
+        setSummary();
     }
 
     /**
@@ -126,5 +126,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Sha
         getPreferenceScreen().getSharedPreferences()
                 .registerOnSharedPreferenceChangeListener(this);
 
+    }
+
+    private void setSummary() {
+        Preference preference = findPreference(getResources().getString(R.string.key_units_prefs));
+        preference.setSummary(mSharedPreferences.getString("units", "Farenheit"));
     }
 }

@@ -6,7 +6,7 @@
         android:defaultValue="Farenheit"
         android:entries="@array/temperature_titles"
         android:entryValues="@array/temperature_values"
-        android:key="temperature_units"
+        android:key="@string/key_units_prefs"
         android:negativeButtonText="Cancel"
         android:positiveButtonText="@null"
         android:title="Units"
